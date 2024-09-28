@@ -42,9 +42,14 @@ func TestArp(t *testing.T) {
 	}
 
 	n1 := notes.Arp(n, "updown", 1)
+	n12 := notes.Arp(n, "updown", 0)
 	n2 := notes.Arp(n, "updown", 2)
 
 	if !NotesComp(n1goal, n1) {
+		t.Fatal("n1 doesn't match")
+	}
+
+	if !NotesComp(n1goal, n12) {
 		t.Fatal("n1 doesn't match")
 	}
 
