@@ -16,21 +16,26 @@ import (
 
 func main() {
 	defer midi.CloseDriver()
-	clock := smf.MetricTicks(96) // resolution: 96 ticks per quarternote 960 is also common
 
-	chord := notes.Min(notes.A1)
-	arp := notes.Arp(chord, "updown", 1)
-	expanded := notes.Expand(arp, 4)
-
-	fmt.Println(clock.Ticks8th())
-	engine.Sequence(0, 0, expanded, uint64(clock.Ticks8th()))
+	var cursor uint64
+	cursor = mkArp(1, cursor, notes.Min(notes.A1))
+	cursor = mkArp(1, cursor, notes.Min(notes.A1))
+	cursor = mkArp(1, cursor, notes.Maj(notes.G1))
+	cursor = mkArp(1, cursor, notes.Maj(notes.F1))
 
 	midiFile := models.NewMidiRequest()
-	midiFile.Tempo = 100
+	midiFile.Tempo = 120
 
 	midiData := engine.Compile(midiFile)
 
 	loopPlay(midiData)
+}
+
+func mkArp(channel uint8, cursor uint64, chord []uint8) uint64 {
+	arp := notes.Arp(chord, "updown", 1)
+	expanded := notes.Expand(arp, 2)
+
+	return engine.Sequence(channel, cursor, expanded, 48)
 }
 
 func loopPlay(file []byte) {
